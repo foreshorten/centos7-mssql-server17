@@ -14,13 +14,16 @@ rm -f /lib/systemd/system/basic.target.wants/*;\
 rm -f /lib/systemd/system/anaconda.target.wants/*;
 
 RUN curl https://packages.microsoft.com/config/rhel/7/mssql-server-2017.repo -so /etc/yum.repos.d/mssql-server2017.repo && \
-#curl https://packages.microsoft.com/config/rhel/7/prod.repo -so /etc/yum.repos.d/mssql-release.repo && \
+curl https://packages.microsoft.com/config/rhel/7/prod.repo -so /etc/yum.repos.d/mssql-release.repo && \
 yum update -y && \
-ACCEPT_EULA=Y yum install -y mssql-server unixODBC-devel && \
+ACCEPT_EULA=Y yum install -y mssql-server mssql-tools unixODBC-devel && \
 yum clean all
+
+EXPOSE 1433
 
 RUN  ln -s /opt/mssql-tools/bin/sqlcmd /usr/local/sbin/sqlcmd && \
      ln -s /opt/mssql-tools/bin/bcp /usr/local/sbin/bcp
 
 VOLUME [ "/sys/fs/cgroup" ]
-CMD ["/usr/sbin/init"]
+#CMD ["/usr/sbin/init"]
+CMD ["/opt/mssql/bin/sqlservr"]
